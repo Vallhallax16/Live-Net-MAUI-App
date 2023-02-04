@@ -16,6 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Setup Keystore File
+      run: | 
+        echo "${{ secrets.KEYSTORE_FILE }}" > mylivenetmauiapp.keystore.asc
+        gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD_GPG }}" --batch mylivenetmauiapp.asc > mylivenetmauiapp.keystore
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -25,4 +29,10 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build MyLiveNetMauiApp/MyLiveNetMauiApp.csproj -c Release -f net7.0-android --no-restore
+      run: dotnet build MyLiveNetMauiApp/MyLiveNetMauiApp.csproj -c Release -f net7.0-android /p:AndroidSigninKeyStore = mylivenetmauiapp.keystore /p:AndroidSigningKeyAlias= mylivenetmauikey /p:AndroidSigningKeyPass = " {{ secrets.KEYSTORE_PASSWORD }}"  --no-restore
+      
+    - name: Setup App Center CLI
+      run: npm install -g appcenter-cli
+    - name: Upload Android app to App Center
+      run: |
+        app center
