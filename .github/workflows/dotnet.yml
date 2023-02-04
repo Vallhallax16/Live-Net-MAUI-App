@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  CI_Android
+  CI_Android:
   
     runs-on: windows-latest
 
